@@ -1,4 +1,4 @@
-##sudo ping -i .001 -w 900 www.google.com  | while read pong; do echo "$(date +"%T.%N"): $pong"; done > first_ping_test5.txt
+##sudo ping -i .001 -w 300 www.google.com  | while read pong; do echo "$(date +"%Y-%m-%d-%T.%N"): $pong"; done > first_ping_test8.txt
 #######################
 ###load data
 #######################
@@ -19,8 +19,6 @@ file_nm<-"first_ping_test7.txt"
 ###load file
 
 z0<-readLines( paste0("../data/raw/",file_nm))
-main_title<-z0[1]
-main_end<-z0[length(z0)-1]
 head(z0)
 tail(z0)
 
@@ -54,7 +52,6 @@ z2%>%ggplot(aes(x=time_sc_rel,y=ping))+geom_line()+
   geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")
 dev.off()
 
-z2%>%ggplot(aes(x=ping))+geom_density()+theme_bw()
 summary(z2)
 
 z2[z2$ping>treshld_píng,]%>%nrow()%>%{.*100/nrow(z2)}
