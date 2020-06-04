@@ -15,7 +15,7 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-file_nm<-"first_ping_test5.txt"
+file_nm<-"first_ping_test6.txt"
 ###load file
 
 z0<-readLines( paste0("../data/raw/",file_nm))
@@ -45,8 +45,14 @@ z2$full_time<-apply(z2[,1:3],1,paste,collapse=":")
 z2$time_sc_rel<-z2$time_sc-min(z2$time_sc)
 head(z2)
 tail(z2)
-
-pdf(file=paste0(output_path,"/","ping_series.pdf"),width=17,height=5)
+treshld_píng<-mean(z2$ping)+2*sd(z2$ping)
+pdf(file=paste0(output_path,"/","ping_series_2.pdf"),width=17,height=5)
 z2%>%ggplot(aes(x=time_sc_rel,y=ping))+geom_line()+
-  scale_x_continuous(breaks = (0:15)*60,labels =0:15)+theme_bw()
+  scale_x_continuous(name ="minutos",breaks = (0:15)*60,labels =0:15)+theme_bw()+
+  geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")
 dev.off()
+
+summary(z2)
+
+z2[z2$ping>treshld_píng,]%>%nrow()%>%{.*100/nrow(z2)}
+z2[z2$ping>treshld_píng,]%>%nrow()%>%{.*100/(max(z2$time_sc_rel)/60)}
