@@ -15,7 +15,7 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-file_nm<-"first_ping_test7.txt"
+file_nm<-"test_08_06_2020_0700h.txt"
 ###load file
 
 z0<-readLines( paste0("../data/raw/",file_nm))
@@ -47,11 +47,16 @@ z2$full_time<-apply(z2[,1:3],1,paste,collapse=":")
 z2$time_sc_rel<-z2$time_sc-min(z2$time_sc)
 head(z2)
 tail(z2)
-treshld_píng<-mean(z2$ping)+2*sd(z2$ping)
-pdf(file=paste0(output_path,"/","ping_series_2.pdf"),width=17,height=5)
+treshld_píng<-round(mean(z2$ping)+2*sd(z2$ping),2)
+my_breaks <- c(seq(0, max(z2$ping), length.out = 5),treshld_píng)
+my_labels <- as.character(my_breaks)
+
+pdf(file=paste0(output_path,"/","test_08_06_2020_0700h.pdf"),width=17,height=5)
 z2%>%ggplot(aes(x=time_sc_rel,y=ping))+geom_line()+
   scale_x_continuous(name ="minutos",breaks = (0:15)*60,labels =0:15)+theme_bw()+
-  geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")
+  geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")+
+  scale_y_continuous(limits = c(0, max(z2$ping)), breaks = my_breaks, labels = my_labels,
+                     name = "ping (ms)")
 dev.off()
 
 z2%>%ggplot(aes(x=ping))+geom_density()+theme_bw()
