@@ -1,4 +1,4 @@
-##sudo ping -i .001 -w 900 www.google.com  | while read pong; do echo "$(date +"%T.%N"): $pong"; done > "test_$(date +"%Y_%m_%d__%H%M").txt"
+##sudo ping -i .001 -w 900 -W 899 www.google.com  | while read pong; do echo "$(date +"%T.%N"): $pong"; done > "test_$(date +"%Y_%m_%d__%H%M").txt"
 #######################
 ###load data
 #######################
@@ -16,7 +16,7 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-test_name<-"test_2020_06_11__1910"
+test_name<-"test_2020_06_12__1105"
 file_nm<-paste0(test_name,".txt")
 ###load file
 
