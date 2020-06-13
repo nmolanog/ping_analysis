@@ -1,4 +1,4 @@
-##sudo ping -i .001 -w 900 -W 899 www.google.com  | while read pong; do echo "$(date +"%T.%N"): $pong"; done > "test_$(date +"%Y_%m_%d__%H%M").txt"
+##sudo timeout 1800s ping -i .001 www.google.com  | while read pong; do echo "$(date +"%T.%N"): $pong"; done > "test_$(date +"%Y_%m_%d__%H%M").txt"
 #######################
 ###load data
 #######################
@@ -16,22 +16,25 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-test_name<-"test_2020_06_12__1312"
+test_name<-"test_2020_06_13__1237"
 file_nm<-paste0(test_name,".txt")
 ###load file
 
 z0<-readLines( paste0("../data/raw/",file_nm))
 main_title<-z0[1]
-main_end<-z0[length(z0)-1]
+#main_end<-z0[length(z0)-1]
 head(z0)
 tail(z0)
 
 z_info<-z0[c(1,length(z0)-1)]
-z0<-z0[-c(1,(length(z0)-3):length(z0))]
+#z0<-z0[-c(1,(length(z0)-3):length(z0))]
+z0<-z0[-1]
 z0%>%str_split_fixed(":",5)->z1
 head(z1)
 tail(z1)
 z1[,4]%>%unique
+
+#z1[z1[,4] %>%str_detect("Unreachable"),]
 z1<-z1[,-4]
 
 unformated_ts<-z1[,4]%>%str_split_fixed(" ",5)
@@ -65,15 +68,15 @@ scale_y_continuous(limits = c(0, max(z2$ping)), breaks = my_breaks, labels = my_
                    name = "ping (ms)")+ ggtitle('ping en tiempo real')
 p2<-z2%>%ggplot(aes(x=ping))+geom_density()+theme_bw()+ ggtitle('distribucion del ping')
 
-p3<-tableGrob(data.frame(stat=c("min","Q1","median","mean","Q3","max","sd"),
+p3<-tableGrob(data.frame(stat=c("min","Q1","median","mean","Q3","max","sd","NA"),
                         value=c(round(min(z2$ping,na.rm = T),3),
                                 round(quantile(z2$ping,0.25,na.rm = T),3),
                                 round(quantile(z2$ping,0.5,na.rm = T),3),
                                 round(mean(z2$ping,na.rm = T),3),
                                 round(quantile(z2$ping,0.75,na.rm = T),3),
                                 round(max(z2$ping,na.rm = T),3),
-                                round(sd(z2$ping,na.rm = T),3)
-                                )),rows =NULL) 
+                                round(sd(z2$ping,na.rm = T),3),
+                                sum(is.na(z2$ping)))),rows =NULL) 
 
 p4<-ping_anom_count%>%ggplot(aes(x=minuto, y=anomalos)) +
   geom_bar(stat="identity")+theme_bw()+ ggtitle('numero de paquetes con ping mayor al humbral')
@@ -84,8 +87,7 @@ grid.arrange(
   widths = c(1,1,1),
   layout_matrix = rbind(c(1,1,1),
                         c(2,3,4)),
-  top=z_info[1],
-  bottom=z_info[2]
+  top=z_info[1]
 )
 dev.off()
 
