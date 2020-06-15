@@ -5,6 +5,17 @@ intbtweentrans=${2:-1}
 urltoping=${3:-"www.google.com"}
 name_file="test_$(date +"%Y_%m_%d__%H%M")"
 
+if [ ! -d "../data/raw" ] 
+then
+    mkdir "../data"
+    mkdir "../data/raw"
+fi
+
+if [ ! -d "../outputs" ] 
+then
+    mkdir "../outputs"
+fi
+
 echo "Total Arguments:" $#
 echo "All Arguments values:" $@
 
