@@ -16,7 +16,7 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-test_name<-"test_2020_06_15__1910"
+test_name<-"test_2020_06_16__0820"
 file_nm<-paste0(test_name,".txt")
 ###load file
 
@@ -54,7 +54,7 @@ z2$time_sc_rel<-z2$time_sc-min(z2$time_sc)
 head(z2)
 tail(z2)
 treshld_píng<-round(mean(z2$ping,na.rm = T)+2*sd(z2$ping,na.rm = T),2)
-my_breaks <- c(seq(0, max(z2$ping,na.rm = T), length.out = 5),treshld_píng)
+my_breaks <- c(seq(min(z2$ping,na.rm = T), max(z2$ping,na.rm = T), length.out = 5),treshld_píng)
 my_labels <- as.character(my_breaks)
 last_min<-(z2$time_sc_rel/60)%>%max%>%ceiling()
 z2$min<-(z2$time_sc_rel/60)%>%cut(breaks=c(-Inf,1:last_min),labels = 0:(last_min-1))
@@ -68,7 +68,7 @@ ggplot_xaxis<-seq(0,last_min,length.out = 30)%>%round(0)
 p1<-z2%>%ggplot(aes(x=time_sc_rel,y=ping))+geom_line()+
 scale_x_continuous(name ="minutos",breaks =ggplot_xaxis*60,labels =ggplot_xaxis)+theme_bw()+
 geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")+
-scale_y_continuous(limits = c(0, max(z2$ping)), breaks = my_breaks, labels = my_labels,
+scale_y_continuous(limits = c(min(z2$ping,na.rm = T), max(z2$ping,na.rm = T)), breaks = my_breaks, labels = my_labels,
                    name = "ping (ms)")+ ggtitle('ping en tiempo real')
 p2<-z2%>%ggplot(aes(x=ping))+geom_density()+theme_bw()+ ggtitle('distribucion del ping')
 
