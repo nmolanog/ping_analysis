@@ -16,7 +16,7 @@ output_path<-"../outputs"
 ####see available xlsx files to load
 list.files("../data/raw")%>%str_subset(".txt")
 ###asign the apropiate name file. without xlsx extencion
-test_name<-"test_2020_06_13__1304"
+test_name<-"test_2020_06_15__1910"
 file_nm<-paste0(test_name,".txt")
 ###load file
 
@@ -61,9 +61,12 @@ z2$min<-(z2$time_sc_rel/60)%>%cut(breaks=c(-Inf,1:last_min),labels = 0:(last_min
 
 ping_anom_count<-z2[z2$ping>treshld_píng,"min"]%>%table%>%{data.frame(.)}
 colnames(ping_anom_count)<-c("minuto","anomalos")
+ping_anom_count$minuto<-as.numeric(ping_anom_count$minuto)
+
+ggplot_xaxis<-seq(0,last_min,length.out = 30)%>%round(0)
 
 p1<-z2%>%ggplot(aes(x=time_sc_rel,y=ping))+geom_line()+
-scale_x_continuous(name ="minutos",breaks = (0:last_min)*60,labels =0:last_min)+theme_bw()+
+scale_x_continuous(name ="minutos",breaks =ggplot_xaxis*60,labels =ggplot_xaxis)+theme_bw()+
 geom_hline(yintercept=treshld_píng,linetype="dashed", color = "red")+
 scale_y_continuous(limits = c(0, max(z2$ping)), breaks = my_breaks, labels = my_labels,
                    name = "ping (ms)")+ ggtitle('ping en tiempo real')
@@ -80,7 +83,7 @@ p3<-tableGrob(data.frame(stat=c("min","Q1","median","mean","Q3","max","sd","NA")
                                 sum(is.na(z2$ping)))),rows =NULL) 
 
 p4<-ping_anom_count%>%ggplot(aes(x=minuto, y=anomalos)) +
-  geom_bar(stat="identity")+theme_bw()+ ggtitle('numero de paquetes con ping mayor al humbral')
+  geom_line()+theme_bw()+ ggtitle('numero de paquetes con ping mayor al humbral')
 
 pdf(file=paste0(output_path,"/",test_name,".pdf"),width=12,height=6)
 grid.arrange(
